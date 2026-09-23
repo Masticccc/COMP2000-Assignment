@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -152,8 +153,14 @@ public class SimulationPanel extends JPanel implements ActionListener {
 
     public void createCells() {
         try {
-            validate();
+            validateSettings();
         } catch (InvalidSettingsException e) {
+            JOptionPane.showMessageDialog(
+        this,
+        e.getMessage(),
+        "Invalid Settings",
+        JOptionPane.ERROR_MESSAGE
+    );
             Settings.INFECTED_COUNT = 3;
             Settings.ANTIVIRUS_COUNT = 3;
         }
@@ -347,13 +354,13 @@ public class SimulationPanel extends JPanel implements ActionListener {
         javax.swing.SwingUtilities.invokeLater(this::updateDimensions);
     }  
 
-    public class InvalidSettingsException extends RuntimeException {
-        public InvalidSettingsException(String message) { super(message); }
-    }
 
-    public void validate() {
-        if (Settings.INFECTED_COUNT + Settings.ANTIVIRUS_COUNT > Settings.CELL_COUNT) {
-            throw new InvalidSettingsException("Infected + antivirus exceeds total cell count");
-        }
+
+    public void validateSettings() throws InvalidSettingsException {
+    if (Settings.INFECTED_COUNT + Settings.ANTIVIRUS_COUNT > Settings.CELL_COUNT) {
+        throw new InvalidSettingsException(
+            "Infected and antivirus cells cannot exceed total cell count."
+        );
     }
+}
 }   
