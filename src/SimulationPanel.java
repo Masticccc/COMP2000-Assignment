@@ -9,9 +9,9 @@ import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.JCheckBox;
 
 public class SimulationPanel extends JPanel implements ActionListener {
     private final List<Cell> cells = new ArrayList<>();
@@ -186,20 +186,24 @@ public class SimulationPanel extends JPanel implements ActionListener {
     }
 
     public int[] countByType() {
-        int neutral = 0, infected = 0, antivirus = 0;
-        for (Cell c : cells) {
-            if (c.getState() == NeutralState.INSTANCE) neutral++;
-            if (c.getState() == InfectedState.INSTANCE) infected++;
-            if (c.getState() == AntivirusState.INSTANCE) antivirus++;
-        }
-        return new int[]{neutral, infected, antivirus};
+    int neutral = 0, infected = 0, antivirus = 0, vaccinated = 0;
+
+    for (Cell c : cells) {
+        if (c.getState() == NeutralState.INSTANCE) neutral++;
+        if (c.getState() == InfectedState.INSTANCE) infected++;
+        if (c.getState() == AntivirusState.INSTANCE) antivirus++;
+        if (c.getState() == VaccinatedState.INSTANCE) vaccinated++;
     }
+
+    return new int[]{neutral, infected, antivirus, vaccinated};
+}
 
     public void drawStats(Graphics g) {
         int[] counts = countByType();
         int neutralCount = counts[0];
         int infectedCount = counts[1];
         int antivirusCount = counts[2];
+        int vaccinatedCount = counts[3];
 
         g.setFont(new Font("Times New Roman", Font.PLAIN, 30));
         g.setColor(Color.BLACK);
@@ -217,12 +221,14 @@ public class SimulationPanel extends JPanel implements ActionListener {
         g.drawString("Infected Cells: " + infectedCount, simScreenX + offset, offset * 16);
         g.setColor(AntivirusState.INSTANCE.getCellColor());
         g.drawString("Antivirus Cells: " + antivirusCount, simScreenX + offset, offset * 19);
+        g.setColor(VaccinatedState.INSTANCE.getCellColor());
+        g.drawString("Vaccinated Cells: " + vaccinatedCount, simScreenX + offset, offset * 22);
         g.setColor(Color.DARK_GRAY);
-        g.drawString("Dead Cells: " + deadCellCount, simScreenX + offset, offset * 22);
+        g.drawString("Dead Cells: " + deadCellCount, simScreenX + offset, offset * 25);
         g.setColor(Color.yellow);
-        g.drawString("Mutated Cells: " + mutatedCellCount, simScreenX + offset, offset * 25);
+        g.drawString("Mutated Cells: " + mutatedCellCount, simScreenX + offset, offset * 28);
         g.setColor(Color.magenta);
-        g.drawString("R0 Value: " + r0, simScreenX + offset, offset * 28);
+        g.drawString("R0 Value: " + r0, simScreenX + offset, offset * 31);
     }
 
     @Override
@@ -277,7 +283,7 @@ public class SimulationPanel extends JPanel implements ActionListener {
 
             int[] counts = countByType();
             statsHistory.add(new SimulationStats(
-                    counts[0], counts[1], counts[2],
+                    counts[0], counts[1], counts[2], counts[3],
                     deadCellCount, mutatedCellCount, r0, simTick));
 
             for (Cell c : cells) {
