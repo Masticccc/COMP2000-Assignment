@@ -13,7 +13,7 @@ public class NeutralState implements CellState {
         if (opponent.getType().equals("INFECTED")) {
             return InfectedState.INSTANCE; // Neutral becomes Infected
         } else if (opponent.getType().equals("ANTIVIRUS")) {
-            return AntivirusState.INSTANCE;  // Antivirus change
+            return VaccinatedState.INSTANCE;  // Neutral becomes vaccinated
         } else {
             return this;  // Neutral on Neutral. No change
         }
