@@ -112,7 +112,7 @@ public class SimulationPanel extends JPanel implements ActionListener {
 
         if (!settingsCreated && simScreenX > 0 && simScreenY > 0) {
             settingsPanel = new Settings().settingsPanel();
-            settingsPanel.setBounds(simScreenX + offset, offset * 29, 180, 120);
+            settingsPanel.setBounds(simScreenX + offset, offset * 41, 180, 120);
             this.add(settingsPanel);
             settingsPanel.revalidate();
             settingsPanel.repaint();
@@ -125,18 +125,18 @@ public class SimulationPanel extends JPanel implements ActionListener {
         }
         // Reposition button based on window size
         if (resetButton != null) {
-            resetButton.setBounds(simScreenX + offset, offset * 43, 180, 50);
+            resetButton.setBounds(simScreenX + offset, offset * 59, 180, 50);
         }
 
         if (settingsPanel != null) {
-            settingsPanel.setBounds(simScreenX + offset, offset * 29, 180, 120);
+            settingsPanel.setBounds(simScreenX + offset, offset * 41, 180, 120);
             settingsPanel.revalidate();
             settingsPanel.repaint();
         }
 
         // Reposition Checkbox based on window size
         if (seasonsCheckBox != null) {
-            seasonsCheckBox.setBounds(simScreenX + offset, offset * 39, 170, 25);
+            seasonsCheckBox.setBounds(simScreenX + offset, offset * 55, 170, 25);
         }
     }
 
@@ -240,6 +240,9 @@ public class SimulationPanel extends JPanel implements ActionListener {
         g.drawString("Mutated Cells: " + mutatedCellCount, simScreenX + offset, offset * 28);
         g.setColor(Color.magenta);
         g.drawString("R0 Value: " + r0, simScreenX + offset, offset * 31);
+        g.setColor(Color.WHITE);
+        g.drawString("Infection Trend:", simScreenX + offset, offset * 34);
+        g.drawString(getInfectionTrend(), simScreenX + offset, offset * 37);
     }
 
     @Override
@@ -330,6 +333,27 @@ public class SimulationPanel extends JPanel implements ActionListener {
         }
         return totalInfectionsCaused / r0InfectedCount;
     }
+
+
+    public String getInfectionTrend() {
+        if (statsHistory.size() < 2) {
+            return "Not enough data";
+        }
+
+        SimulationStats previous = statsHistory.get(statsHistory.size() - 2);
+        SimulationStats current = statsHistory.get(statsHistory.size() - 1);
+
+        int difference = current.getInfectedCount() - previous.getInfectedCount();
+
+        if (difference > 0) {
+            return "Increasing (+" + difference + ")";
+        } else if (difference < 0) {
+            return "Decreasing (" + difference + ")";
+        } else {
+            return "Stable";
+        }
+    }
+
 
     public List<SimulationStats> getStatsHistory(){
         return statsHistory;
