@@ -14,6 +14,7 @@ public class Cell {
 
     private double speedMultiplier = 1.0;
     private double sizeMultiplier = 1.0;
+    private MovementStrategy movementStrategy = new NormalMovement();
     private int id;
     private CellState state;
     private Color color; // Default color for the cell
@@ -213,8 +214,8 @@ public class Cell {
         if (panelMaxWidth <= 0 || panelMaxHeight <= 0) {
             return;
         }
-        x += velX;
-        y += velY;
+        x += velX * movementStrategy.getSpeedMultiplier();
+        y += velY * movementStrategy.getSpeedMultiplier();
 
         if (x <= panelMinWidth) {
             x = panelMinWidth;
@@ -249,6 +250,12 @@ public class Cell {
                 centYB - centYA);
 
         return distance <= radiusA + radiusB;
+    }
+
+    public void setMovementStrategy(MovementStrategy strategy) {
+        if (strategy != null) {
+            this.movementStrategy = strategy;
+        }
     }
 
     public void setSpeedMultiplier(double multiplier) {
