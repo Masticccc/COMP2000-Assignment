@@ -12,9 +12,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+
 
 public class SimulationPanel extends JPanel implements ActionListener {
     private final List<Cell> cells = new ArrayList<>();
@@ -30,6 +32,8 @@ public class SimulationPanel extends JPanel implements ActionListener {
     public int statScreenX = 200;
     private boolean cellsCreated = false;
     private JButton resetButton;
+    private JComboBox<String> movementSelector;
+    private MovementStrategy currentMovementStrategy = new NormalMovement();
     private boolean buttonCreated = false;
     private JPanel settingsPanel;
     private boolean settingsCreated = false;
@@ -96,6 +100,30 @@ public class SimulationPanel extends JPanel implements ActionListener {
         this.add(seasonsCheckBox);
     }
 
+
+    private void createMovementSelector() {
+        String[] options = {"Normal Movement", "Slow Movement"};
+
+        movementSelector = new JComboBox<>(options);
+
+        movementSelector.addActionListener(e -> {
+            if (movementSelector.getSelectedIndex() == 0) {
+                currentMovementStrategy = new NormalMovement();
+            } else {
+                currentMovementStrategy = new SlowMovement();
+            }
+
+            for (Cell cell : cells) {
+                cell.setMovementStrategy(currentMovementStrategy);
+            }
+
+            repaint();
+        });
+
+        this.add(movementSelector);
+    }
+
+
     public void updateDimensions() {
         simScreenX = this.getWidth() - statScreenX - offset;
         simScreenY = this.getHeight() - offset;
@@ -138,6 +166,21 @@ public class SimulationPanel extends JPanel implements ActionListener {
         if (seasonsCheckBox != null) {
             seasonsCheckBox.setBounds(simScreenX + offset, offset * 55, 170, 25);
         }
+
+
+        if (movementSelector == null && simScreenX > 0 && simScreenY > 0) {
+            createMovementSelector();
+        }
+
+        if (movementSelector != null) {
+            movementSelector.setBounds(
+                simScreenX + offset,
+                offset * 66,
+                180,
+                30
+            );
+        }
+
     }
 
     @Override
@@ -177,6 +220,9 @@ public class SimulationPanel extends JPanel implements ActionListener {
         } else {
             cells.add(new Cell(randomX, randomY, i, NeutralState.INSTANCE));
         }
+    }
+    for (Cell cell : cells) {
+        cell.setMovementStrategy(currentMovementStrategy);
     }
 }
 
@@ -293,6 +339,9 @@ public class SimulationPanel extends JPanel implements ActionListener {
         cells.removeAll(toRemove);
         deadCellCount += toRemove.size();
         cells.addAll(toAdd);
+        for (Cell cell : toAdd) {
+            cell.setMovementStrategy(currentMovementStrategy);
+        }
         mutatedCellCount += toAdd.size();
 
         if (simTick % 125 == 0) {
