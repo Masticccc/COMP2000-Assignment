@@ -239,10 +239,13 @@ public class SimulationPanel extends JPanel implements ActionListener {
         g.setColor(Color.yellow);
         g.drawString("Mutated Cells: " + mutatedCellCount, simScreenX + offset, offset * 28);
         g.setColor(Color.magenta);
-        g.drawString("R0 Value: " + r0, simScreenX + offset, offset * 31);
+        g.drawString("R0 Value: " + r0, simScreenX + offset, offset * 31);    
         g.setColor(Color.WHITE);
-        g.drawString("Infection Trend:", simScreenX + offset, offset * 34);
-        g.drawString(getInfectionTrend(), simScreenX + offset, offset * 37);
+        g.drawString("Trend: " + getInfectionTrend(),
+            simScreenX + offset, offset * 35);
+        g.drawString("Avg Infected (10): " +
+        String.format("%.1f", getAverageInfected()),
+            simScreenX + offset, offset * 38);
     }
 
     @Override
@@ -353,6 +356,22 @@ public class SimulationPanel extends JPanel implements ActionListener {
             return "Stable";
         }
     }
+
+
+    public double getAverageInfected() {
+    int size = statsHistory.size();
+
+    if (size == 0) {
+        return 0;
+    }
+
+    return statsHistory.stream()
+            .skip(Math.max(0, size - 10))
+            .mapToInt(SimulationStats::getInfectedCount)
+            .average()
+            .orElse(0);
+    }
+
 
 
     public List<SimulationStats> getStatsHistory(){
