@@ -8,6 +8,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -193,14 +195,16 @@ public class SimulationPanel extends JPanel implements ActionListener {
     }
 
     public int[] countByType() {
-    int neutral = 0, infected = 0, antivirus = 0, vaccinated = 0;
+    Map<String, Long> counts = cells.stream()
+            .collect(Collectors.groupingBy(
+                    c -> c.getState().getType(),
+                    Collectors.counting()
+            ));
 
-    for (Cell c : cells) {
-        if (c.getState() == NeutralState.INSTANCE) neutral++;
-        if (c.getState() == InfectedState.INSTANCE) infected++;
-        if (c.getState() == AntivirusState.INSTANCE) antivirus++;
-        if (c.getState() == VaccinatedState.INSTANCE) vaccinated++;
-    }
+    int neutral = counts.getOrDefault("NEUTRAL", 0L).intValue();
+    int infected = counts.getOrDefault("INFECTED", 0L).intValue();
+    int antivirus = counts.getOrDefault("ANTIVIRUS", 0L).intValue();
+    int vaccinated = counts.getOrDefault("VACCINATED", 0L).intValue();
 
     return new int[]{neutral, infected, antivirus, vaccinated};
 }
